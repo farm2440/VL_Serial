@@ -1,0 +1,324 @@
+ 0000                   cpu LMM
+                        .module main.c
+                        .area text(rom, con, rel)
+ 0000                   .dbfile ./main.c
+ 0000                   .dbfile G:\work\PSoC\VL_SER~1\VL_SER~1\main.c
+ 0000                   .dbfunc e main _main fV
+ 0000           ;           mode -> X+27
+ 0000           ;              c -> X+26
+ 0000           ;            str -> X+6
+ 0000           ;        counter -> X+5
+ 0000           ;         status -> X+4
+ 0000           ;              i -> X+0
+ 0000           _main::
+ 0000                   .dbline -1
+ 0000 10                push X
+ 0001 4F                mov X,SP
+ 0002 381E              add SP,30
+ 0004                   .dbline 12
+ 0004           ; //----------------------------------------------------------------------------
+ 0004           ; // C main line
+ 0004           ; //----------------------------------------------------------------------------
+ 0004           ; 
+ 0004           ; #include <m8c.h>        // part specific constants and macros
+ 0004           ; #include "PSoCAPI.h"    // PSoC API definitions for all User Modules
+ 0004           ; 
+ 0004           ; #include "stdio.h"
+ 0004           ; 
+ 0004           ; 
+ 0004           ; void main(void)
+ 0004           ; {
+ 0004                   .dbline 25
+ 0004           ;       // M8C_EnableGInt ; // Uncomment this line to enable Global Interrupts
+ 0004           ;       // Insert your main routine code here.
+ 0004           ;       
+ 0004           ;       /*
+ 0004           ;       UART (Digital Comm - UART) блок e конфигуриран за 115200 bps като такта му е от VC3 = SysClock/26 =24MHz = 923076 Hz
+ 0004           ;       115200 * 8 = 921600
+ 0004           ;        
+ 0004           ;       PSoC изпраща периодично ASCII низ представящ стойността на брояч, който всеки път нараства с единица. 
+ 0004           ;       При получен символ ‘h’ по серииния интерфейс, броячът започва да се показва в шестнайсеттичен вид. 
+ 0004           ;       При ‘d’ стойността се праща отново в десетичен вид. При ‘с’ броячът се нулира.
+ 0004           ;       */
+ 0004           ;       
+ 0004           ;       unsigned char counter = 0;
+ 0004 560500            mov [X+5],0
+ 0007                   .dbline 32
+ 0007           ;       enum Mode { MODE_HEX=0, MODE_DEC=1 } mode;
+ 0007           ;       char str[20];
+ 0007           ;       unsigned char status;
+ 0007           ;       unsigned char c;
+ 0007           ;       long int i;
+ 0007           ;       
+ 0007           ;       mode = MODE_DEC;
+ 0007 561B01            mov [X+27],1
+ 000A                   .dbline 33
+ 000A           ;       UART_Start(UART_PARITY_NONE);
+ 000A 10                push X
+ 000B 5000              mov A,0
+ 000D 7C0000            xcall _UART_Start
+ 0010 20                pop X
+ 0011 812D              xjmp L3
+ 0013           L2:
+ 0013                   .dbline 36
+ 0013           ;       
+ 0013           ;       while(1)
+ 0013           ;       {
+ 0013                   .dbline 37
+ 0013           ;               counter++;
+ 0013 7705              inc [X+5]
+ 0015                   .dbline 39
+ 0015           ;               //Подготвя се низа за изпращане
+ 0015           ;               if (mode==MODE_DEC) csprintf(str, "C=%d \r\n",      (int)counter);
+ 0015 3D1B01            cmp [X+27],1
+ 0018 B026              jnz L5
+ 001A                   .dbline 39
+ 001A 62D000            mov REG[0xd0],>__r0
+ 001D 5205              mov A,[X+5]
+ 001F 5300              mov [__r1],A
+ 0021 5000              mov A,0
+ 0023 08                push A
+ 0024 5100              mov A,[__r1]
+ 0026 08                push A
+ 0027 5037              mov A,>L7
+ 0029 08                push A
+ 002A 5037              mov A,<L7
+ 002C 08                push A
+ 002D 5A00              mov [__r1],X
+ 002F 060006            add [__r1],6
+ 0032 5007              mov A,7
+ 0034 08                push A
+ 0035 5100              mov A,[__r1]
+ 0037 08                push A
+ 0038 7C0000            xcall _csprintf
+ 003B 38FA              add SP,-6
+ 003D 8024              xjmp L6
+ 003F           L5:
+ 003F                   .dbline 40
+ 003F           ;               else                            csprintf(str, "C=0x%x \r\n", (int )counter);
+ 003F 62D000            mov REG[0xd0],>__r0
+ 0042 5205              mov A,[X+5]
+ 0044 5300              mov [__r1],A
+ 0046 5000              mov A,0
+ 0048 08                push A
+ 0049 5100              mov A,[__r1]
+ 004B 08                push A
+ 004C 502D              mov A,>L8
+ 004E 08                push A
+ 004F 502D              mov A,<L8
+ 0051 08                push A
+ 0052 5A00              mov [__r1],X
+ 0054 060006            add [__r1],6
+ 0057 5007              mov A,7
+ 0059 08                push A
+ 005A 5100              mov A,[__r1]
+ 005C 08                push A
+ 005D 7C0000            xcall _csprintf
+ 0060 38FA              add SP,-6
+ 0062           L6:
+ 0062           L9:
+ 0062                   .dbline 42
+ 0062           ;               //Изчаква се буфера да е празен
+ 0062           ;               do {
+ 0062                   .dbline 43
+ 0062           ;                       status = UART_bReadTxStatus();
+ 0062 10                push X
+ 0063 7C0000            xcall _UART_bReadTxStatus
+ 0066 20                pop X
+ 0067 62D000            mov REG[0xd0],>__r0
+ 006A 5404              mov [X+4],A
+ 006C                   .dbline 44
+ 006C           ;               }while ( (~status) & UART_TX_BUFFER_EMPTY );
+ 006C           L10:
+ 006C                   .dbline 44
+ 006C 62D000            mov REG[0xd0],>__r0
+ 006F 5204              mov A,[X+4]
+ 0071 73                cpl A
+ 0072 5300              mov [__r0],A
+ 0074 260010            and [__r0],16
+ 0077 BFEA              jnz L9
+ 0079                   .dbline 46
+ 0079           ;               //Низа се праща по UART
+ 0079           ;               UART_PutString(str);
+ 0079 5A00              mov [__r1],X
+ 007B 060006            add [__r1],6
+ 007E 10                push X
+ 007F 5007              mov A,7
+ 0081 08                push A
+ 0082 5100              mov A,[__r1]
+ 0084 5C                mov X,A
+ 0085 18                pop A
+ 0086 7C0000            xcall _UART_PutString
+ 0089 20                pop X
+ 008A                   .dbline 49
+ 008A           ;               
+ 008A           ;               //Някакво закъснение
+ 008A           ;               for (i=0 ; i!=150000 ; i++);
+ 008A 560000            mov [X+0],0
+ 008D 560100            mov [X+1],0
+ 0090 560200            mov [X+2],0
+ 0093 560300            mov [X+3],0
+ 0096           L12:
+ 0096                   .dbline 49
+ 0096           L13:
+ 0096                   .dbline 49
+ 0096 070301            add [X+3],1
+ 0099 0F0200            adc [X+2],0
+ 009C 0F0100            adc [X+1],0
+ 009F 0F0000            adc [X+0],0
+ 00A2                   .dbline 49
+ 00A2 BFF3              jnz L12
+ 00A4 3D0102            cmp [X+1],2
+ 00A7 BFEE              jnz L12
+ 00A9 3D0249            cmp [X+2],73
+ 00AC BFE9              jnz L12
+ 00AE 3D03F0            cmp [X+3],-16
+ 00B1 BFE4              jnz L12
+ 00B3           X1:
+ 00B3                   .dbline 52
+ 00B3           ;               
+ 00B3           ;               //Проверка за приет символ
+ 00B3           ;               c = UART_cReadChar(); //Ако няма приет символ функцията връща 0 веднага
+ 00B3 10                push X
+ 00B4 7C0000            xcall _UART_cReadChar
+ 00B7 20                pop X
+ 00B8 62D000            mov REG[0xd0],>__r0
+ 00BB 541A              mov [X+26],A
+ 00BD                   .dbline 53
+ 00BD           ;               switch (c)
+ 00BD 521A              mov A,[X+26]
+ 00BF 541D              mov [X+29],A
+ 00C1 561C00            mov [X+28],0
+ 00C4 3D1C00            cmp [X+28],0
+ 00C7 B006              jnz X2
+ 00C9 3D1D43            cmp [X+29],67
+ 00CC A063              jz L23
+ 00CE           X2:
+ 00CE 3D1C00            cmp [X+28],0
+ 00D1 B006              jnz X3
+ 00D3 3D1D44            cmp [X+29],68
+ 00D6 A037              jz L19
+ 00D8           X3:
+ 00D8 3D1C00            cmp [X+28],0
+ 00DB B006              jnz X4
+ 00DD 3D1D48            cmp [X+29],72
+ 00E0 A03E              jz L21
+ 00E2           X4:
+ 00E2 521D              mov A,[X+29]
+ 00E4 1143              sub A,67
+ 00E6 521C              mov A,[X+28]
+ 00E8 3180              xor A,-128
+ 00EA 1980              sbb A,(0 ^ 0x80)
+ 00EC C052              jc L17
+ 00EE           X5:
+ 00EE           L25:
+ 00EE 3D1C00            cmp [X+28],0
+ 00F1 B006              jnz X6
+ 00F3 3D1D63            cmp [X+29],99
+ 00F6 A039              jz L23
+ 00F8           X6:
+ 00F8 3D1C00            cmp [X+28],0
+ 00FB B006              jnz X7
+ 00FD 3D1D64            cmp [X+29],100
+ 0100 A00D              jz L19
+ 0102           X7:
+ 0102 3D1C00            cmp [X+28],0
+ 0105 B006              jnz X8
+ 0107 3D1D68            cmp [X+29],104
+ 010A A014              jz L21
+ 010C           X8:
+ 010C 8032              xjmp L17
+ 010E           L19:
+ 010E                   .dbline 57
+ 010E           ;               {
+ 010E           ;                       case 'd':
+ 010E           ;                       case 'D':
+ 010E           ;                               mode = MODE_DEC;
+ 010E 561B01            mov [X+27],1
+ 0111                   .dbline 58
+ 0111           ;                               UART_CPutString("mode = DEC \r\n");
+ 0111 10                push X
+ 0112 501F              mov A,>L20
+ 0114 08                push A
+ 0115 501F              mov A,<L20
+ 0117 5C                mov X,A
+ 0118 18                pop A
+ 0119 7C0000            xcall _UART_CPutString
+ 011C 20                pop X
+ 011D                   .dbline 59
+ 011D           ;                               break;
+ 011D 8021              xjmp L17
+ 011F           L21:
+ 011F                   .dbline 62
+ 011F           ;                       case 'h':
+ 011F           ;                       case 'H':                               
+ 011F           ;                               mode = MODE_HEX;
+ 011F 561B00            mov [X+27],0
+ 0122                   .dbline 63
+ 0122           ;                               UART_CPutString("mode = HEX \r\n");
+ 0122 10                push X
+ 0123 5011              mov A,>L22
+ 0125 08                push A
+ 0126 5011              mov A,<L22
+ 0128 5C                mov X,A
+ 0129 18                pop A
+ 012A 7C0000            xcall _UART_CPutString
+ 012D 20                pop X
+ 012E                   .dbline 64
+ 012E           ;                               break;;
+ 012E 8010              xjmp L17
+ 0130           L23:
+ 0130                   .dbline 67
+ 0130           ;                       case 'c':
+ 0130           ;                       case 'C':
+ 0130           ;                               UART_CPutString("clear counter \r\n");
+ 0130 10                push X
+ 0131 5000              mov A,>L24
+ 0133 08                push A
+ 0134 5000              mov A,<L24
+ 0136 5C                mov X,A
+ 0137 18                pop A
+ 0138 7C0000            xcall _UART_CPutString
+ 013B 20                pop X
+ 013C                   .dbline 68
+ 013C           ;                               counter=0;
+ 013C 560500            mov [X+5],0
+ 013F                   .dbline 69
+ 013F           ;                               break;
+ 013F                   .dbline 71
+ 013F           ;                       default :
+ 013F           ;                               break;;
+ 013F                   .dbline 71
+ 013F           L17:
+ 013F                   .dbline 73
+ 013F           ;               }
+ 013F           ;       }
+ 013F           L3:
+ 013F                   .dbline 35
+ 013F 8ED3              xjmp L2
+ 0141           X0:
+ 0141                   .dbline -2
+ 0141           L1:
+ 0141 38E2              add SP,-30
+ 0143 20                pop X
+ 0144                   .dbline 0 ; func end
+ 0144 8FFF              jmp .
+ 0146                   .dbsym l mode 27 c
+ 0146                   .dbsym l c 26 c
+ 0146                   .dbsym l str 6 A[20:20]c
+ 0146                   .dbsym l counter 5 c
+ 0146                   .dbsym l status 4 c
+ 0146                   .dbsym l i 0 L
+ 0146                   .dbend
+                        .area lit(rom, con, rel, lit)
+ 0000           L24:
+ 0000 636C65617220636F756E746572200D0A  .byte 'c,'l,'e,'a,'r,32,'c,'o,'u,'n,'t,'e,'r,32,13,10
+ 0010 00                .byte 0
+ 0011           L22:
+ 0011 6D6F6465203D20484558200D0A00      .byte 'm,'o,'d,'e,32,61,32,'H,'E,'X,32,13,10,0
+ 001F           L20:
+ 001F 6D6F6465203D20444543200D0A00      .byte 'm,'o,'d,'e,32,61,32,'D,'E,'C,32,13,10,0
+ 002D           L8:
+ 002D 433D30782578200D0A00      .byte 'C,61,48,'x,37,'x,32,13,10,0
+ 0037           L7:
+ 0037 433D2564200D0A00  .byte 'C,61,37,'d,32,13,10,0
