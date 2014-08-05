@@ -23,12 +23,12 @@ LMM info: area 'data' item of 2 bytes allocated in SRAM page 0
 
 idata dump at output/VL_Serial.idata
 
-  ROM 13% full. 4129 out of 32768 bytes used (does not include absolute areas).
+  ROM 13% full. 4109 out of 32768 bytes used (does not include absolute areas).
 
   RAM 3% full. 36 bytes used (does not include stack usage).
 
 Built with ICCM8C STD V7.05.00
 
  
-VL_Serial - 0 error(s) 0 warning(s) 09:49:05
+VL_Serial - 0 error(s) 0 warning(s) 12:30:11
 

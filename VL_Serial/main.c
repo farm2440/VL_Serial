@@ -25,7 +25,6 @@ void main(void)
 	unsigned char counter = 0;
 	enum Mode { MODE_HEX=0, MODE_DEC=1 } mode;
 	char str[20];
-	unsigned char status;
 	unsigned char c;
 	long int i;
 	
@@ -38,10 +37,6 @@ void main(void)
 		//Подготвя се низа за изпращане
 		if (mode==MODE_DEC) csprintf(str, "C=%d \r\n",      (int)counter);
 		else 				csprintf(str, "C=0x%x \r\n", (int )counter);
-		//Изчаква се буфера да е празен
-		do {
-			status = UART_bReadTxStatus();
-		}while ( (~status) & UART_TX_BUFFER_EMPTY );
 		//Низа се праща по UART
 		UART_PutString(str);
 		

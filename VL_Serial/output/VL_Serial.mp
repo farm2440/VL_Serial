@@ -1,6 +1,6 @@
 Project:      output/VL_Serial
 Build Number: 0
-Date:         Sun Jul 27 09:49:04 2014
+Date:         Tue Aug 05 12:30:10 2014
 Compiler:     ICCM8C
 Version:      7.05.00
 
@@ -58,8 +58,8 @@ Area                               Addr   Size   Decimal Bytes (Attributes)
        0574  UART_Stop
        057B  UART_SendData
        057B  _UART_SendData
-       057E  _bUART_ReadTxStatus
        057E  _UART_bReadTxStatus
+       057E  _bUART_ReadTxStatus
        057E  UART_bReadTxStatus
        057E  bUART_ReadTxStatus
        0581  bUART_ReadRxData
@@ -100,25 +100,25 @@ Area                               Addr   Size   Decimal Bytes (Attributes)
 
 Area                               Addr   Size   Decimal Bytes (Attributes)
 --------------------------------   ----   ----   ------- ----- ------------
-                            text   069D   0B24 =   2852. bytes (rel,con,rom,code)
+                            text   069D   0B10 =   2832. bytes (rel,con,rom,code)
 
        Addr  Global Symbol
       -----  --------------------------------
        069D  _main
        069D  __text_start
-       0827  __plcall
-       0833  _itoa
-       0A0C  _utoa
-       0B4F  _isdigit
-       0B70  _islower
-       0B91  _isspace
-       0BB2  _toupper
-       0BF0  __csdepi
-       0C22  _csprintf
-       0C8B  __cprint
-       11C1  __xidata_start
-       11C1  __text_end
-       11CC  __xidata_end
+       0813  __plcall
+       081F  _itoa
+       09F8  _utoa
+       0B3B  _isdigit
+       0B5C  _islower
+       0B7D  _isspace
+       0B9E  _toupper
+       0BDC  __csdepi
+       0C0E  _csprintf
+       0C77  __cprint
+       11AD  __xidata_start
+       11AD  __text_end
+       11B8  __xidata_end
 
 Area                               Start  End    Decimal Bytes (Attributes)
 --------------------------------   ----   ----   ------- ----- ------------
